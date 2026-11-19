@@ -228,12 +228,21 @@ class NewProfileActivity : BaseActivity<NewProfileDesign>() {
     }
 
     private suspend fun createProfileByQrCode(url: String) {
+        // clash://install-config?url=<encoded>  -> 取出真正的订阅地址
+        val realUrl = if (url.startsWith("clash://") || url.startsWith("clashmeta://")) {
+            runCatching {
+                android.net.Uri.parse(url).getQueryParameter("url")
+            }.getOrNull() ?: url
+        } else {
+            url
+        }
+
         withProfile {
             launchProperties(
                 create(
                     type = Profile.Type.Url,
                     name = getString(R.string.new_profile),
-                    url,
+                    realUrl,
                 )
             )
         }
