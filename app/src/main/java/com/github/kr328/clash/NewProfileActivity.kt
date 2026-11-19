@@ -49,7 +49,9 @@ class NewProfileActivity : BaseActivity<NewProfileDesign>() {
         lifecycleScope.launch {
             val text = withContext(Dispatchers.IO) {
                 runCatching {
-                    val bmp = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+                    val bmp = contentResolver.openInputStream(uri)?.use {
+                        android.graphics.BitmapFactory.decodeStream(it)
+                    } ?: throw IllegalStateException("cannot open stream")
                     val w = bmp.width
                     val h = bmp.height
                     val px = IntArray(w * h)
