@@ -27,6 +27,12 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.withContext
+import android.provider.MediaStore
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.zxing.BinaryBitmap
+import com.google.zxing.MultiFormatReader
+import com.google.zxing.RGBLuminanceSource
+import com.google.zxing.common.HybridBinarizer
 import java.util.*
 
 class NewProfileActivity : BaseActivity<NewProfileDesign>() {
@@ -34,6 +40,32 @@ class NewProfileActivity : BaseActivity<NewProfileDesign>() {
         get() = this
 
     private val scanLauncher = registerForActivityResult(ScanQRCode(), ::scanResultHandler)
+
+    private val galleryLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri == null) {
+            return@registerForActivityResult
+        }
+        lifecycleScope.launch {
+            val text = withContext(Dispatchers.IO) {
+                runCatching {
+                    val bmp = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+                    val w = bmp.width
+                    val h = bmp.height
+                    val px = IntArray(w * h)
+                    bmp.getPixels(px, 0, w, 0, 0, w, h)
+                    val src = RGBLuminanceSource(w, h, px)
+                    MultiFormatReader().decode(BinaryBitmap(HybridBinarizer(src))).text
+                }.getOrNull()
+            }
+            if (text != null) {
+                createProfileByQrCode(text)
+            } else {
+                design?.showExceptionToast(getString(R.string.import_from_qr_exception))
+            }
+        }
+    }
 
     override suspend fun main() {
         val design = NewProfileDesign(this)
@@ -88,6 +120,10 @@ class NewProfileActivity : BaseActivity<NewProfileDesign>() {
 
                         is NewProfileDesign.Request.OpenDetail -> {
                             launchAppDetailed(it.provider)
+                        }
+
+                        is NewProfileDesign.Request.LaunchGallery -> {
+                            galleryLauncher.launch("image/*")
                         }
 
                         is NewProfileDesign.Request.LaunchScanner -> {
@@ -163,7 +199,8 @@ class NewProfileActivity : BaseActivity<NewProfileDesign>() {
             listOf(
                 ProfileProvider.File(self),
                 ProfileProvider.Url(self),
-                ProfileProvider.QR(self)
+                ProfileProvider.QR(self),
+                ProfileProvider.Gallery(self)
             ) + providers
         }
     }
