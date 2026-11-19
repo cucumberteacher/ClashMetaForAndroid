@@ -26,6 +26,7 @@ jobs:
       - name: Configure
         run: |
           echo "custom.application.id=com.dsh.vpn" > local.properties
+          echo "remove.suffix=true" >> local.properties
           echo "sdk.dir=$ANDROID_HOME" >> local.properties
           chmod +x gradlew
       - name: Build
