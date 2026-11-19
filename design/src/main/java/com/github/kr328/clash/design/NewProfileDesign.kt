@@ -12,6 +12,7 @@ class NewProfileDesign(context: Context) : Design<NewProfileDesign.Request>(cont
         data class Create(val provider: ProfileProvider) : Request()
         data class OpenDetail(val provider: ProfileProvider.External) : Request()
         data class LaunchScanner(val provider: ProfileProvider.QR) : Request()
+        data class LaunchGallery(val provider: ProfileProvider.Gallery) : Request()
     }
 
     private val binding = DesignNewProfileBinding
@@ -39,6 +40,10 @@ class NewProfileDesign(context: Context) : Design<NewProfileDesign.Request>(cont
     }
 
     private fun requestCreate(provider: ProfileProvider) {
+        if (provider is ProfileProvider.Gallery) {
+            requests.trySend(Request.LaunchGallery(provider))
+            return
+        }
         if (provider is ProfileProvider.QR) {
             requests.trySend(Request.LaunchScanner(provider))
         } else {
