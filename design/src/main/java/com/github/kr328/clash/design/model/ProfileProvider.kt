@@ -35,6 +35,16 @@ sealed class ProfileProvider {
         override val icon: Drawable?
             get() = context.getDrawableCompat(R.drawable.baseline_qr_code_scanner)
     }
+
+    class Gallery(private val context: Context) : ProfileProvider() {
+        override val name: String
+            get() = "相册"
+        override val summary: String
+            get() = "从相册图片导入"
+        override val icon: Drawable?
+            get() = context.getDrawableCompat(R.drawable.baseline_qr_code_scanner)
+    }
+
     class External(
         override val name: String,
         override val summary: String,
