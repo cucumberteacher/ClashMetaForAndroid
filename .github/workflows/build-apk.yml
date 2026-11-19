@@ -1,0 +1,29 @@
+name: Build APK
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - uses: android-actions/setup-android@v3
+      - name: Configure
+        run: |
+          echo "custom.application.id=com.dsh.vpn" > local.properties
+          echo "sdk.dir=$ANDROID_HOME" >> local.properties
+          chmod +x gradlew
+      - name: Build
+        run: ./gradlew :app:assembleMetaRelease --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsh-vpn-apk
+          path: app/build/outputs/apk/**/*.apk
