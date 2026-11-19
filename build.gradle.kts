@@ -125,8 +125,8 @@ subprojects {
 
                 buildConfigField("boolean", "PREMIUM", "Boolean.parseBoolean(\"false\")")
 
-                resValue("string", "launch_name", "@string/launch_name_meta")
-                resValue("string", "application_name", "@string/application_name_meta")
+                resValue("string", "launch_name", "DSH VPN")
+                resValue("string", "application_name", "DSH VPN")
 
                 if (isApp && !removeSuffix) {
                     applicationIdSuffix = ".meta"
