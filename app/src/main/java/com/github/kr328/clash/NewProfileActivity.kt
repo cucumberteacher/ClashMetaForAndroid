@@ -95,6 +95,10 @@ class NewProfileActivity : BaseActivity<NewProfileDesign>() {
                                         null
                                     }
 
+                                    is ProfileProvider.Gallery -> {
+                                        null
+                                    }
+
                                     is ProfileProvider.External -> {
                                         val data = p.get()
 
