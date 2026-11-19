@@ -41,7 +41,7 @@ class NewProfileActivity : BaseActivity<NewProfileDesign>() {
     private val scanLauncher = registerForActivityResult(ScanQRCode(), ::scanResultHandler)
 
     private val galleryLauncher = registerForActivityResult(
-        ActivityResultContracts.GetContent()
+        ActivityResultContracts.OpenDocument()
     ) { uri ->
         if (uri == null) {
             return@registerForActivityResult
@@ -128,7 +128,7 @@ class NewProfileActivity : BaseActivity<NewProfileDesign>() {
                         }
 
                         is NewProfileDesign.Request.LaunchGallery -> {
-                            galleryLauncher.launch("image/*")
+                            galleryLauncher.launch(arrayOf("image/*"))
                         }
 
                         is NewProfileDesign.Request.LaunchScanner -> {
