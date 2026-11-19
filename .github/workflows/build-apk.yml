@@ -5,17 +5,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v6
         with:
-          submodules: recursive
-      - uses: actions/setup-java@v4
+          fetch-depth: 0
+      - name: Checkout submodules
+        run: git submodule update --init --recursive --force
+      - name: Setup Java
+        uses: actions/setup-java@v5
         with:
-          java-version: '21'
-          distribution: 'temurin'
-      - uses: actions/setup-go@v5
+          distribution: temurin
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
-      - uses: android-actions/setup-android@v3
+          go-download-base-url: https://github.com/MetaCubeX/go/releases/download/build
+          go-version: '1.26'
       - name: Configure
         run: |
           echo "custom.application.id=com.dsh.vpn" > local.properties
