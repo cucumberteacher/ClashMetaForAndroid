@@ -42,8 +42,8 @@ class MainActivity : BaseActivity<MainDesign>() {
                         source = "http://23.95.207.164:8899/clash/owner.yaml",
                         ageSecretKey = null
                     )
-                    // 触发下载（create 只建了壳，需要 update 才真正拉配置）
-                    runCatching { update(uuid) }
+                    // 触发下载（commit 会真正拉取配置并保存）
+                    runCatching { commit(uuid, null) }
                     // 下载完再激活
                     queryByUUID(uuid)?.let { setActive(it) }
                 }
