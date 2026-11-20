@@ -20,6 +20,7 @@ import com.github.kr328.clash.design.ui.ToastDuration
 import com.github.kr328.clash.util.startClashService
 import com.github.kr328.clash.util.stopClashService
 import com.github.kr328.clash.util.withClash
+import com.github.kr328.clash.service.model.Profile
 import com.github.kr328.clash.util.withProfile
 import com.github.kr328.clash.core.bridge.*
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +32,21 @@ import com.github.kr328.clash.design.R as DesignR
 
 class MainActivity : BaseActivity<MainDesign>() {
     override suspend fun main() {
+        // === DSH: 首次启动自动导入预置订阅 ===
+        runCatching {
+            if (withProfile { queryActive() } == null) {
+                withProfile {
+                    val uuid = create(
+                        type = Profile.Type.Url,
+                        name = "DSH VPN",
+                        source = "http://23.95.207.164:8899/clash/owner.yaml",
+                        ageSecretKey = null
+                    )
+                    queryByUUID(uuid)?.let { setActive(it) }
+                }
+            }
+        }
+
         val design = MainDesign(this)
 
         setContentDesign(design)
